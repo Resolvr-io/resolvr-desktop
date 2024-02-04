@@ -86,15 +86,7 @@ export default function UserAuthForm() {
     console.log("secretKeyStr: ", secretKey);
 
     // TODO: Hook up auth to pubkey and seckey
-    window.localStorage.setItem("secretKey", secretKey);
-    window.localStorage.setItem("publicKey", getPublicKey(secretKeyUint8));
     navigate("/");
-    // await signIn("credentials", {
-    //   publicKey,
-    //   secretKey,
-    //   redirect: true,
-    //   callbackUrl: "/",
-    // });
   }
 
   return (

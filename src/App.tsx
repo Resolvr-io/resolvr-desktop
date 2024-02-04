@@ -7,6 +7,7 @@ import BountyPage from "./pages/BountyPage";
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import SigninPage from "./pages/SigninPage";
+import UserPage from "./pages/UserPage";
 
 // import BlogPage from "./pages/BlogPage";
 // import Header from "./components/header/Header";
@@ -15,19 +16,16 @@ import SigninPage from "./pages/SigninPage";
 export default function App() {
   return (
     <>
-      {/* <Header /> */}
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/b/:naddr" element={<BountyPage />} />
+          <Route path="/u/:npub" element={<UserPage />} />
         </Route>
         <Route element={<Login />}>
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/signin" element={<SigninPage />} />
         </Route>
-
-        {/* <Route path="/write" element={<WritePage />} /> */}
-        {/* <Route path="blog/:naddr" element={<BlogPage />} /> */}
       </Routes>
       <Toaster />
     </>

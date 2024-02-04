@@ -1,9 +1,9 @@
+import * as crypto from "crypto";
+
 import { clsx, type ClassValue } from "clsx";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { twMerge } from "tailwind-merge";
-
-import * as crypto from "crypto";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -41,3 +41,21 @@ export function createIdentifier(title: string, pubkey: string): string {
   const uniqueHash = generateUniqueHash(title + pubkey, 12);
   return `${titleSlug}-${uniqueHash}`;
 }
+
+export const validateGithub = async (
+  npub: string,
+  github: string,
+  gist: string,
+) => {
+  try {
+    const res = await (
+      await fetch(`https://gist.github.com/${github}/${gist}/raw`)
+    ).text();
+    return (
+      res.trim() ===
+      `Verifying that I control the following Nostr public key: ${npub}`
+    );
+  } catch (_) {
+    return false;
+  }
+};

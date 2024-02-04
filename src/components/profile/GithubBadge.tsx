@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-// import { validateGithub } from "~/server";
+import { validateGithub } from "~/lib/utils";
 import { useRelayStore } from "~/store/relay-store";
 import { CheckCircle, Github } from "lucide-react";
 import { nip19 } from "nostr-tools";
@@ -33,9 +33,7 @@ export default function GithubBadge({ pubkey }: Props) {
       github: string,
       gist: string,
     ) {
-      // TODO: Make this work without next server
-      // const validGist = await validateGithub(npub, github, gist);
-      const validGist = true;
+      const validGist = await validateGithub(npub, github, gist);
       setGithubVerified(validGist);
     }
 
