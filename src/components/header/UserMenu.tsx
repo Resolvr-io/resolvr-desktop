@@ -5,6 +5,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import useAuthStore from "~/store/auth-store";
 import { useRelayStore } from "~/store/relay-store";
 import { nip19 } from "nostr-tools";
 import { Link } from "react-router-dom";
@@ -16,9 +17,13 @@ type Props = {
 };
 
 export default function UserMenu({ children }: Props) {
-  const pubkey = "";
+  const { pubkey, setPubkey } = useAuthStore();
 
   const { setRelaySheetOpen } = useRelayStore();
+
+  const signOut = () => {
+    setPubkey(undefined);
+  };
 
   return (
     <DropdownMenu>
@@ -33,13 +38,11 @@ export default function UserMenu({ children }: Props) {
           <Link to="/settings">Settings</Link>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setRelaySheetOpen(true)}>
-          {/* <RelaySheet> */}
           Relays
-          {/* </RelaySheet> */}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={() => console.log("signing out")}
+          onClick={signOut}
           className="dark:text-red-400 dark:focus:bg-red-400/10 dark:focus:text-red-400 "
         >
           Sign Out

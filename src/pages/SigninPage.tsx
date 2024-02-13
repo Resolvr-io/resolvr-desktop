@@ -1,93 +1,32 @@
-"use client";
-
 import { useState } from "react";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { invoke } from "@tauri-apps/api/tauri";
 import { Button } from "~/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
-import { getPublicKey, nip19 } from "nostr-tools";
-import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import * as z from "zod";
-
-const isValidNpub = (npub: string) => {
-  try {
-    return nip19.decode(npub).type === "npub";
-  } catch (e) {
-    return false;
-  }
-};
-
-const isValidNsec = (nsec: string) => {
-  try {
-    return nip19.decode(nsec).type === "nsec";
-  } catch (e) {
-    return false;
-  }
-};
-
-const formSchema = z.object({
-  // npub: z.string().refine(isValidNpub, {
-  //   message: "Invalid npub.",
-  // }),
-  nsec: z.string().refine(isValidNsec, {
-    message: "Invalid nsec.",
-  }),
-});
+import useAuthStore from "~/store/auth-store";
+import { nip19 } from "nostr-tools";
+import { useNavigate } from "react-router-dom";
 
 export default function UserAuthForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const navigate = useNavigate();
+  const { setPubkey } = useAuthStore();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      // npub: "",
-      nsec: "",
-    },
-  });
+  const navigate = useNavigate();
 
   const signInWithExtension = async (
     e: React.MouseEvent<HTMLButtonElement>,
   ) => {
     e.preventDefault();
     setIsLoading(true);
-    // TODO: Hook up auth to pubkey and seckey
-    // if (typeof window.nostr !== "undefined") {
-    // const publicKey: string = await window.nostr.getPublicKey();
-    // console.log("publicKey: ", publicKey);
-    // await signIn("credentials", {
-    //   publicKey: publicKey,
-    //   secretKey: new Uint8Array(0),
-    //   redirect: true,
-    //   callbackUrl: "/",
-    // });
-    // } else {
-    //   alert("No extension found");
-    // }
-  };
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
-    const { nsec } = values;
-    // const publicKey = nip19.decode(npub).data as string;
-    const secretKeyUint8 = nip19.decode(nsec).data as Uint8Array;
-    const array = Array.from(secretKeyUint8);
-    const secretKey = JSON.stringify(array);
+    const npub = (await invoke("login")) as string;
 
-    console.log("secretKeyStr: ", secretKey);
+    const pubkey = nip19.decode(npub).data as string;
 
-    // TODO: Hook up auth to pubkey and seckey
+    setPubkey(pubkey);
+
     navigate("/");
-  }
+  };
 
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center pt-20 sm:px-6 lg:px-8">
@@ -97,53 +36,17 @@ export default function UserAuthForm() {
             <h1 className="text-2xl font-semibold tracking-tight">
               Sign in to your account
             </h1>
-            <p className="text-sm text-muted-foreground">
-              New to Nostr?{" "}
-              <Link
-                to="/register"
-                className="font-semibold text-indigo-500 dark:text-indigo-400"
-              >
-                Create an account
-              </Link>
-            </p>
+            {/* <p className="text-sm text-muted-foreground"> */}
+            {/*   New to Nostr?{" "} */}
+            {/*   <Link */}
+            {/*     to="/register" */}
+            {/*     className="font-semibold text-indigo-500 dark:text-indigo-400" */}
+            {/*   > */}
+            {/*     Create an account */}
+            {/*   </Link> */}
+            {/* </p> */}
           </div>
 
-          <Form {...form}>
-            <form
-              className="flex flex-col gap-3"
-              onSubmit={form.handleSubmit(onSubmit)}
-            >
-              <FormField
-                control={form.control}
-                name="nsec"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        disabled={isLoading}
-                        placeholder="nsec..."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={isLoading}>
-                Sign In
-              </Button>
-            </form>
-          </Form>
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
-              </span>
-            </div>
-          </div>
           <Button
             className="flex gap-x-1"
             variant="outline"
@@ -152,8 +55,7 @@ export default function UserAuthForm() {
             disabled={isLoading}
           >
             <svg
-              className="-ml-3.5 -mt-0.5 h-6 w-6 fill-primary-foreground"
-              // id="_8"
+              className="-ml-3.5 -mt-0.5 h-6 w-6 fill-primary"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 256 256"
             >

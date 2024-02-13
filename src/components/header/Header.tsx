@@ -7,19 +7,10 @@ import { Button } from "../ui/button";
 // import { ThemeToggle } from "../ui/theme-toggle";
 import LoginButton from "./LoginButton";
 import UserProfile from "./UserProfile";
+import useAuthStore from "~/store/auth-store";
 
 export default function Header() {
-  const session = "";
-  let loggedIn = false;
-  let publicKey = "";
-
-  // if (session?.user) {
-  //   const user = session?.user as UserWithKeys;
-  //   publicKey = user.publicKey;
-  //   if (publicKey) {
-  //     loggedIn = true;
-  //   }
-  // }
+  const { pubkey } = useAuthStore();
 
   return (
     <header className="mb-2 flex items-center justify-between py-4">
@@ -32,7 +23,7 @@ export default function Header() {
         </Link>
       </nav>
       <div className="flex items-center justify-center gap-x-4">
-        {loggedIn && (
+        {pubkey && (
           <Button
             asChild
             variant="outline"
@@ -46,7 +37,7 @@ export default function Header() {
           </Button>
         )}
         {/* <ThemeToggle /> */}
-        {loggedIn ? <UserProfile pubkey={publicKey} /> : <LoginButton />}
+        {pubkey ? <UserProfile pubkey={pubkey} /> : <LoginButton />}
       </div>
     </header>
   );

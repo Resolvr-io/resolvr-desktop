@@ -1,13 +1,13 @@
 import BountyFeed from "~/components/bounty-feed/BountyFeed";
 import BountyTags from "~/components/bounty-feed/BountyTags";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import useAuthStore from "~/store/auth-store";
 import { type Filter } from "nostr-tools";
 
 export default function HomePage() {
   const selectedTab = "open";
 
-  let loggedIn = false;
-  let publicKey = "";
+  const { pubkey } = useAuthStore();
 
   const filter: Filter = {
     kinds: [30050],
@@ -28,20 +28,20 @@ export default function HomePage() {
 
   return (
     <div className="w-full flex-col items-center">
-      {loggedIn && (
+      {pubkey && (
         <div className="flex flex-col py-4">
-          {/* BUG: fix tabs not updating sometimes */}
           <Tabs defaultValue={selectedTab}>
             <div className="flex items-center justify-between">
               <h1 className="select-none text-center text-3xl font-bold">
                 Bounties
               </h1>
-              <div className="mr-1 flex items-center">
-                <TabsList className="bg-secondary/90">
-                  <TabsTrigger asChild value="open"></TabsTrigger>
-                  <TabsTrigger asChild value="posted"></TabsTrigger>
-                </TabsList>
-              </div>
+              {/* TODO: figure out why this isn't showing the tabs*/}
+              {/* <div className="mr-1 flex items-center"> */}
+              {/*   <TabsList className="bg-secondary/90"> */}
+              {/*     <TabsTrigger asChild value="open"></TabsTrigger> */}
+              {/*     <TabsTrigger asChild value="posted"></TabsTrigger> */}
+              {/*   </TabsList> */}
+              {/* </div> */}
             </div>
           </Tabs>
 
