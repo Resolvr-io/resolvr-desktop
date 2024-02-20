@@ -37,7 +37,7 @@
     "react-hook-form": "^7.50.0",
     "react-markdown": "^9.0.1",
     "react-nocomment-fork": "^0.5.0",
-    "react-nostr": "^0.0.6",
+    "react-nostr": "0.0.9",
     "react-router-dom": "^6.21.3",
     "sonner": "^1.4.0",
     "tailwind-merge": "^2.2.1",

@@ -1,6 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use nip_70::PayInvoiceRequest;
 use nostr_sdk::ToBech32;
 
 use nostr_sdk::prelude::*;
@@ -14,8 +15,13 @@ async fn login() -> String {
 }
 
 #[tauri::command]
-async fn sign_event(event: String) -> String {
+async fn pay_invoice(pay_invoice_request: PayInvoiceRequest) {
+    println!("{:?}", pay_invoice_request);
+    nip_70::pay_invoice(pay_invoice_request).await.unwrap();
+}
 
+#[tauri::command]
+async fn sign_event(event: String) -> String {
     println!("{:?}", event);
 
     let unsigned_event = UnsignedEvent::from_json(event).unwrap();
@@ -26,16 +32,12 @@ async fn sign_event(event: String) -> String {
 
     return signed_event.as_json().to_string();
 
-
     // println!("{:?}", nip_70::sign_event(event).await.unwrap());
-
-
-
 }
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![login, sign_event])
+        .invoke_handler(tauri::generate_handler![login, sign_event, pay_invoice])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

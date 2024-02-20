@@ -1892,9 +1892,9 @@ checksum = "e4a24736216ec316047a1fc4252e27dabb04218aa4a3f37c6e7ddbf1f9782b54"
 
 [[package]]
 name = "nip-70"
-version = "0.3.0"
+version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ab7eff9b5ce18b55ba50195887046aeaa15b198277b37b5d9fdc214cba86b382"
+checksum = "2c68ede14d408ca0bd2adb480abcf306be2786ab189f90dcbf7eee0b982307b5"
 dependencies = [
  "anyhow",
  "async-trait",
