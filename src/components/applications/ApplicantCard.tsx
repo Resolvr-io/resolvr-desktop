@@ -1,6 +1,7 @@
 // import useAuth from "~/hooks/useAuth";
 
 import { fromNow } from "~/lib/utils";
+import useAuthStore from "~/store/auth-store";
 import { useRelayStore } from "~/store/relay-store";
 import { type Event } from "nostr-tools";
 import { tag, useBatchedEvents, useBatchedProfiles } from "react-nostr";
@@ -21,8 +22,7 @@ export default function ApplicationCard({
   bountyEvent,
 }: Props) {
   const applicantPubkey = applicationEvent.pubkey;
-  // TODO: Hook up auth to pubkey and seckey
-  const pubkey = "";
+  const { pubkey } = useAuthStore();
   const { subRelays } = useRelayStore();
 
   const profileEvent = useBatchedProfiles(applicationEvent.pubkey, subRelays);

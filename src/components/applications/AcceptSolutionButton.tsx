@@ -1,3 +1,7 @@
+import { useEffect } from "react";
+
+import { invoke } from "@tauri-apps/api/tauri";
+import useAuthStore from "~/store/auth-store";
 import { useRelayStore } from "~/store/relay-store";
 import { Check } from "lucide-react";
 import { type Event, type EventTemplate } from "nostr-tools";
@@ -5,8 +9,6 @@ import { allTags, finishEvent, tag, usePublish, useZap } from "react-nostr";
 import { toast } from "sonner";
 
 import { Button } from "../ui/button";
-
-// import { revalidateCachedTag } from "~/server";
 
 type Props = {
   applicationEvent: Event;
@@ -19,15 +21,17 @@ export default function AcceptSolutionButton({
   bountyEvent,
   recipientMetadata,
 }: Props) {
-  // TODO: Hook up auth to pubkey and seckey
-  const pubkey = "";
-  const seckey = new Uint8Array(2);
+  const { pubkey } = useAuthStore();
   const { pubRelays, subRelays } = useRelayStore();
-  const { zap, status: zapStatus } = useZap({
+  const {
+    zap,
+    status: zapStatus,
+    sendPaymentResponse,
+  } = useZap({
     eventKey: `zap-${applicationEvent.id}`,
     relays: subRelays,
   });
-  //
+
   const { publish, removeEvent, addEvent, status } = usePublish({
     relays: pubRelays,
   });
@@ -35,7 +39,9 @@ export default function AcceptSolutionButton({
   const sendZap = async () => {
     if (!pubkey) return;
 
-    const onPaymentSuccess = (sendPaymentResponse: SendPaymentResponse) => {
+    const onPaymentSuccess = async (
+      sendPaymentResponse: SendPaymentResponse,
+    ) => {
       toast("Zap sent", {
         description: `Payment hash: ${sendPaymentResponse.paymentHash}`,
       });
@@ -75,7 +81,7 @@ export default function AcceptSolutionButton({
       recipientMetadata: recipientMetadata,
       eventId: applicationEvent.id,
       content: "",
-      secretKey: seckey,
+      useQRCode: true,
       onPaymentSuccess,
       onPaymentFailure,
       onZapReceipts,
@@ -86,8 +92,6 @@ export default function AcceptSolutionButton({
   async function handleCompleteBounty(
     zapReceiptEvent: Event | undefined = undefined,
   ) {
-    console.log("zapReceiptEvent", zapReceiptEvent);
-
     if (!pubkey) return;
 
     const identifier = tag("d", bountyEvent);
@@ -132,7 +136,7 @@ export default function AcceptSolutionButton({
       created_at: Math.floor(Date.now() / 1000),
     };
 
-    const event = await finishEvent(eventTemplate, seckey);
+    const event = await finishEvent(eventTemplate);
 
     const onSuccess = (event: Event) => {
       // TODO: REMOVE THE OLD APPLICATION EVENTS for the old bounty id
@@ -158,6 +162,20 @@ export default function AcceptSolutionButton({
 
     await publish(event, onSuccess);
   }
+
+  useEffect(() => {
+    async function sendInvoice() {
+      if (sendPaymentResponse) {
+        await invoke("pay_invoice", {
+          payInvoiceRequest: {
+            invoice: sendPaymentResponse as string,
+          },
+        });
+      }
+    }
+
+    sendInvoice();
+  }, [sendPaymentResponse]);
 
   async function handleAcceptSolution(
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
