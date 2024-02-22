@@ -9,7 +9,10 @@ use nostr_sdk::prelude::*;
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
 async fn login() -> String {
-    let public_key = nip_70::get_public_key().await.unwrap();
+    let public_key = nip_70::Nip70Client::default()
+        .get_public_key()
+        .await
+        .unwrap();
     let npub = public_key.to_bech32().unwrap();
     return npub;
 }
@@ -17,7 +20,10 @@ async fn login() -> String {
 #[tauri::command]
 async fn pay_invoice(pay_invoice_request: PayInvoiceRequest) {
     println!("{:?}", pay_invoice_request);
-    nip_70::pay_invoice(pay_invoice_request).await.unwrap();
+    nip_70::Nip70Client::default()
+        .pay_invoice(pay_invoice_request)
+        .await
+        .unwrap();
 }
 
 #[tauri::command]
@@ -28,7 +34,10 @@ async fn sign_event(event: String) -> String {
 
     println!("{:?}", unsigned_event);
 
-    let signed_event = nip_70::sign_event(unsigned_event).await.unwrap();
+    let signed_event = nip_70::Nip70Client::default()
+        .sign_event(unsigned_event)
+        .await
+        .unwrap();
 
     return signed_event.as_json().to_string();
 
